@@ -1,0 +1,129 @@
+
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DailyBoost</title>
+<style>
+body {
+  margin: 0;
+  font-family: Arial;
+  background: #111126;
+  color: white;
+  padding: 25px;
+}
+.container {
+  max-width: 500px;
+  margin: auto;
+}
+h1 { color: #a78bfa; }
+.card {
+  background: #22223d;
+  padding: 20px;
+  border-radius: 16px;
+  margin: 15px 0;
+}
+input {
+  padding: 13px;
+  border: none;
+  border-radius: 8px;
+  width: 65%;
+}
+button {
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background: #8b5cf6;
+  color: white;
+  cursor: pointer;
+}
+li {
+  padding: 12px;
+  background: #30304e;
+  margin: 8px 0;
+  border-radius: 8px;
+  list-style: none;
+}
+.done {
+  text-decoration: line-through;
+  opacity: 0.5;
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>🚀 DailyBoost</h1>
+  <p>Gör något bra för dig själv idag!</p>
+
+  <div class="card">
+    <h2>⭐ XP: <span id="xp">0</span></h2>
+    <h3>🎯 Nivå: <span id="level">1</span></h3>
+    <p>🔥 Fortsätt kämpa!</p>
+  </div>
+
+  <div class="card">
+    <h2>Mina uppgifter</h2>
+    <input id="task" placeholder="Skriv en uppgift...">
+    <button onclick="addTask()">Lägg till</button>
+    <ul id="tasks"></ul>
+  </div>
+</div>
+
+<script>
+let xp = Number(localStorage.getItem("xp")) || 0;
+let tasks = JSON.parse(
+  localStorage.getItem("tasks") || "[]"
+);
+
+function save() {
+  localStorage.setItem("xp", xp);
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+  document.getElementById("xp").textContent = xp;
+  document.getElementById("level").textContent =
+    Math.floor(xp / 100) + 1;
+}
+
+function render() {
+  const list = document.getElementById("tasks");
+  list.innerHTML = "";
+
+  tasks.forEach((task, i) => {
+    const li = document.createElement("li");
+    li.textContent = task.done ? "✅ " : "⬜ ";
+    const label = document.createElement("span");
+    label.textContent = task.name;
+    if (task.done) label.className = "done";
+    li.appendChild(label);
+
+    if (!task.done) {
+      const btn = document.createElement("button");
+      btn.textContent = "Klar!";
+      btn.style.float = "right";
+      btn.onclick = () => {
+        tasks[i].done = true;
+        xp += 20;
+        save();
+        render();
+      };
+      li.appendChild(btn);
+    }
+    list.appendChild(li);
+  });
+}
+
+function addTask() {
+  const input = document.getElementById("task");
+  if (!input.value.trim()) return;
+
+  tasks.push({name: input.value.trim(), done: false});
+  input.value = "";
+  save();
+  render();
+}
+
+save();
+render();
+</script>
+</body>
+</html>
